@@ -110,6 +110,28 @@ export const listarCategorias = async (req, res) => {
   }
 };
 
+// Criar nova categoria
+export const criarCategoria = async (req, res) => {
+  try {
+    const { nome } = req.body;
+
+    // Validação
+    if (!nome || !nome.trim()) {
+      return res.status(400).json({ message: 'Nome da categoria é obrigatório' });
+    }
+
+    const novaCategoria = await Category.create(nome.trim());
+
+    res.status(201).json({
+      message: 'Categoria criada com sucesso',
+      categoria: novaCategoria
+    });
+  } catch (error) {
+    console.error('Erro ao criar categoria:', error);
+    res.status(500).json({ message: 'Erro ao criar categoria' });
+  }
+};
+
 // Adicionar receita aos favoritos
 export const adicionarFavorito = async (req, res) => {
   try {
