@@ -1,19 +1,19 @@
-import db from '../config/database.js';
+import Recipe from '../models/Recipe.js';
+import Category from '../models/Category.js';
 
 // Listar todas as receitas do usuário
 export const listarReceitas = async (req, res) => {
   try {
-    const [receitas] = await db.query(
-      `SELECT r.*, c.nome as categoria_nome, u.nome as usuario_nome
-       FROM receitas r
-       LEFT JOIN categorias c ON r.id_categorias = c.id
-       LEFT JOIN usuarios u ON r.id_usuarios = u.id
-       WHERE r.id_usuarios = ?
-       ORDER BY r.criado_em DESC`,
-      [req.user.id]
-    );
+    const { search, categoryId, sortBy, sortOrder } = req.query;
 
-    res.json(receitas);
+    const recipes = await Recipe.findByUserId(req.user.id, {
+      search,
+      categoryId,
+      sortBy,
+      sortOrder
+    });
+
+    res.json(recipes);
   } catch (error) {
     console.error('Erro ao listar receitas:', error);
     res.status(500).json({ message: 'Erro ao listar receitas' });
@@ -25,20 +25,13 @@ export const buscarReceita = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const [receitas] = await db.query(
-      `SELECT r.*, c.nome as categoria_nome, u.nome as usuario_nome
-       FROM receitas r
-       LEFT JOIN categorias c ON r.id_categorias = c.id
-       LEFT JOIN usuarios u ON r.id_usuarios = u.id
-       WHERE r.id = ? AND r.id_usuarios = ?`,
-      [id, req.user.id]
-    );
+    const recipe = await Recipe.findById(id, req.user.id);
 
-    if (receitas.length === 0) {
+    if (!recipe) {
       return res.status(404).json({ message: 'Receita não encontrada' });
     }
 
-    res.json(receitas[0]);
+    res.json(recipe);
   } catch (error) {
     console.error('Erro ao buscar receita:', error);
     res.status(500).json({ message: 'Erro ao buscar receita' });
@@ -48,47 +41,18 @@ export const buscarReceita = async (req, res) => {
 // Criar nova receita
 export const criarReceita = async (req, res) => {
   try {
-    const {
-      nome,
-      id_categorias,
-      tempo_preparo_minutos,
-      porcoes,
-      modo_preparo,
-      ingredientes
-    } = req.body;
+    const { nome, modo_preparo } = req.body;
 
     // Validações
     if (!nome || !modo_preparo) {
       return res.status(400).json({ message: 'Nome e modo de preparo são obrigatórios' });
     }
 
-    const [result] = await db.query(
-      `INSERT INTO receitas
-       (id_usuarios, id_categorias, nome, tempo_preparo_minutos, porcoes, modo_preparo, ingredientes, criado_em, alterado_em)
-       VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [
-        req.user.id,
-        id_categorias || null,
-        nome,
-        tempo_preparo_minutos || null,
-        porcoes || null,
-        modo_preparo,
-        ingredientes || null
-      ]
-    );
-
-    // Buscar receita criada
-    const [novaReceita] = await db.query(
-      `SELECT r.*, c.nome as categoria_nome
-       FROM receitas r
-       LEFT JOIN categorias c ON r.id_categorias = c.id
-       WHERE r.id = ?`,
-      [result.insertId]
-    );
+    const novaReceita = await Recipe.create(req.user.id, req.body);
 
     res.status(201).json({
       message: 'Receita criada com sucesso',
-      receita: novaReceita[0]
+      receita: novaReceita
     });
   } catch (error) {
     console.error('Erro ao criar receita:', error);
@@ -100,54 +64,16 @@ export const criarReceita = async (req, res) => {
 export const atualizarReceita = async (req, res) => {
   try {
     const { id } = req.params;
-    const {
-      nome,
-      id_categorias,
-      tempo_preparo_minutos,
-      porcoes,
-      modo_preparo,
-      ingredientes
-    } = req.body;
 
-    // Verificar se a receita existe e pertence ao usuário
-    const [receitaExistente] = await db.query(
-      'SELECT id FROM receitas WHERE id = ? AND id_usuarios = ?',
-      [id, req.user.id]
-    );
+    const receitaAtualizada = await Recipe.update(id, req.user.id, req.body);
 
-    if (receitaExistente.length === 0) {
+    if (!receitaAtualizada) {
       return res.status(404).json({ message: 'Receita não encontrada' });
     }
 
-    await db.query(
-      `UPDATE receitas
-       SET nome = ?, id_categorias = ?, tempo_preparo_minutos = ?, porcoes = ?,
-           modo_preparo = ?, ingredientes = ?, alterado_em = NOW()
-       WHERE id = ? AND id_usuarios = ?`,
-      [
-        nome,
-        id_categorias || null,
-        tempo_preparo_minutos || null,
-        porcoes || null,
-        modo_preparo,
-        ingredientes || null,
-        id,
-        req.user.id
-      ]
-    );
-
-    // Buscar receita atualizada
-    const [receitaAtualizada] = await db.query(
-      `SELECT r.*, c.nome as categoria_nome
-       FROM receitas r
-       LEFT JOIN categorias c ON r.id_categorias = c.id
-       WHERE r.id = ?`,
-      [id]
-    );
-
     res.json({
       message: 'Receita atualizada com sucesso',
-      receita: receitaAtualizada[0]
+      receita: receitaAtualizada
     });
   } catch (error) {
     console.error('Erro ao atualizar receita:', error);
@@ -160,20 +86,11 @@ export const deletarReceita = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Verificar se a receita existe e pertence ao usuário
-    const [receitaExistente] = await db.query(
-      'SELECT id FROM receitas WHERE id = ? AND id_usuarios = ?',
-      [id, req.user.id]
-    );
+    const deleted = await Recipe.delete(id, req.user.id);
 
-    if (receitaExistente.length === 0) {
+    if (!deleted) {
       return res.status(404).json({ message: 'Receita não encontrada' });
     }
-
-    await db.query(
-      'DELETE FROM receitas WHERE id = ? AND id_usuarios = ?',
-      [id, req.user.id]
-    );
 
     res.json({ message: 'Receita deletada com sucesso' });
   } catch (error) {
@@ -185,10 +102,108 @@ export const deletarReceita = async (req, res) => {
 // Listar todas as categorias
 export const listarCategorias = async (req, res) => {
   try {
-    const [categorias] = await db.query('SELECT * FROM categorias ORDER BY nome');
+    const categorias = await Category.findAllWithStats();
     res.json(categorias);
   } catch (error) {
     console.error('Erro ao listar categorias:', error);
     res.status(500).json({ message: 'Erro ao listar categorias' });
+  }
+};
+
+// Adicionar receita aos favoritos
+export const adicionarFavorito = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const added = await Recipe.addToFavorites(req.user.id, id);
+
+    if (!added) {
+      return res.status(400).json({ message: 'Receita já está nos favoritos' });
+    }
+
+    res.json({ message: 'Receita adicionada aos favoritos' });
+  } catch (error) {
+    console.error('Erro ao adicionar favorito:', error);
+    res.status(500).json({ message: 'Erro ao adicionar favorito' });
+  }
+};
+
+// Remover receita dos favoritos
+export const removerFavorito = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const removed = await Recipe.removeFromFavorites(req.user.id, id);
+
+    if (!removed) {
+      return res.status(404).json({ message: 'Receita não está nos favoritos' });
+    }
+
+    res.json({ message: 'Receita removida dos favoritos' });
+  } catch (error) {
+    console.error('Erro ao remover favorito:', error);
+    res.status(500).json({ message: 'Erro ao remover favorito' });
+  }
+};
+
+// Listar receitas favoritas
+export const listarFavoritos = async (req, res) => {
+  try {
+    const favoritos = await Recipe.findFavorites(req.user.id);
+    res.json(favoritos);
+  } catch (error) {
+    console.error('Erro ao listar favoritos:', error);
+    res.status(500).json({ message: 'Erro ao listar favoritos' });
+  }
+};
+
+// Avaliar receita
+export const avaliarReceita = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nota, comentario } = req.body;
+
+    // Validação
+    if (!nota || nota < 1 || nota > 5) {
+      return res.status(400).json({ message: 'Nota deve ser entre 1 e 5' });
+    }
+
+    await Recipe.addRating(req.user.id, id, nota, comentario);
+
+    res.json({ message: 'Avaliação registrada com sucesso' });
+  } catch (error) {
+    console.error('Erro ao avaliar receita:', error);
+    res.status(500).json({ message: 'Erro ao avaliar receita' });
+  }
+};
+
+// Remover avaliação
+export const removerAvaliacao = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const removed = await Recipe.removeRating(req.user.id, id);
+
+    if (!removed) {
+      return res.status(404).json({ message: 'Avaliação não encontrada' });
+    }
+
+    res.json({ message: 'Avaliação removida com sucesso' });
+  } catch (error) {
+    console.error('Erro ao remover avaliação:', error);
+    res.status(500).json({ message: 'Erro ao remover avaliação' });
+  }
+};
+
+// Listar avaliações de uma receita
+export const listarAvaliacoes = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const avaliacoes = await Recipe.getRatings(id);
+    res.json(avaliacoes);
+  } catch (error) {
+    console.error('Erro ao listar avaliações:', error);
+    res.status(500).json({ message: 'Erro ao listar avaliações' });
   }
 };

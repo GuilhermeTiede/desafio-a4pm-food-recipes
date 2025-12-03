@@ -101,6 +101,42 @@ Os containers estão configurados com **hot-reload automático**:
 - ✅ Interface responsiva e acessível
 - ✅ Validação de formulários no frontend e backend
 
+### 🌟 Funcionalidades Extras (Não Solicitadas no Teste)
+
+> **Nota**: As funcionalidades abaixo foram implementadas para demonstrar conhecimento adicional em arquitetura e boas práticas de desenvolvimento, mesmo não sendo requisitos do teste.
+
+#### Sistema de Favoritos
+- ✅ Marcar receitas como favoritas
+- ✅ Listar todas as receitas favoritas
+- ✅ Remover receitas dos favoritos
+- ✅ Indicador visual de receitas favoritadas
+
+#### Sistema de Avaliações
+- ✅ Avaliar receitas com notas de 1 a 5 estrelas
+- ✅ Adicionar comentários nas avaliações
+- ✅ Visualizar média de avaliações por receita
+- ✅ Listar todas as avaliações de uma receita
+- ✅ Atualizar ou remover avaliações próprias
+
+#### Busca Avançada
+- ✅ Busca por texto (nome, ingredientes, modo de preparo)
+- ✅ Filtro por categoria
+- ✅ Ordenação customizável (data, nome, avaliação)
+- ✅ Índice FULLTEXT para performance
+
+#### Arquitetura Avançada
+- ✅ **Camada de Models**: Separação clara da lógica de negócio
+- ✅ **Sistema de Migrations**: Versionamento e controle do schema do banco
+- ✅ **Padrão Repository**: Encapsulamento de acesso a dados
+- ✅ **Queries Otimizadas**: JOINs, agregações e índices
+- ✅ **Estatísticas em Tempo Real**: Contadores e médias calculadas
+
+Estas funcionalidades demonstram:
+- Capacidade de ir além dos requisitos
+- Conhecimento em arquitetura de software escalável
+- Experiência com features comuns em sistemas reais
+- Preocupação com performance e manutenibilidade
+
 ## 📁 Estrutura do Projeto
 
 ```
@@ -108,7 +144,9 @@ desafio-a4pm-food-recipes/
 ├── backend/
 │   ├── src/
 │   │   ├── config/         # Configurações (DB, Swagger)
-│   │   ├── controllers/    # Lógica de negócio
+│   │   ├── controllers/    # Lógica de requisição/resposta
+│   │   ├── models/         # Models (User, Recipe, Category)
+│   │   ├── migrations/     # Migrations do banco de dados
 │   │   ├── middlewares/    # Auth, validações
 │   │   ├── routes/         # Definição de rotas
 │   │   └── index.js        # Entry point
@@ -143,11 +181,16 @@ O banco de dados foi modelado seguindo as **boas práticas de normalização** e
 - **usuarios**: Dados dos usuários com autenticação
 - **receitas**: Receitas cadastradas pelos usuários
 - **categorias**: Categorias pré-definidas (13 categorias)
+- **favoritos**: Receitas favoritadas pelos usuários (nova)
+- **avaliacoes**: Avaliações e comentários de receitas (nova)
 
 ### Relacionamentos
 - Receitas pertencem a um usuário (1:N)
 - Receitas podem ter uma categoria (N:1, opcional)
-- Constraints de integridade referencial
+- Favoritos relacionam usuários e receitas (N:M)
+- Avaliações relacionam usuários e receitas (N:M com nota e comentário)
+- Constraints de integridade referencial e CASCADE
+- Índices FULLTEXT para busca rápida
 
 A pasta `banco/` contém o diagrama DER completo e o script SQL para criação automática.
 
@@ -173,7 +216,23 @@ A API está totalmente documentada com **Swagger/OpenAPI 3.0**, disponível em:
 - `DELETE /api/receitas/:id` - Deletar receita
 
 #### Categorias
-- `GET /api/receitas/categorias` - Listar todas as categorias
+- `GET /api/receitas/categorias` - Listar todas as categorias com estatísticas
+
+#### Favoritos (Novo)
+- `GET /api/receitas/favoritos/list` - Listar receitas favoritas
+- `POST /api/receitas/:id/favorito` - Adicionar aos favoritos
+- `DELETE /api/receitas/:id/favorito` - Remover dos favoritos
+
+#### Avaliações (Novo)
+- `GET /api/receitas/:id/avaliacoes` - Listar avaliações de uma receita
+- `POST /api/receitas/:id/avaliar` - Avaliar receita (nota 1-5 + comentário)
+- `DELETE /api/receitas/:id/avaliar` - Remover avaliação
+
+#### Query Parameters
+- `?search=texto` - Busca por texto em nome, ingredientes e modo de preparo
+- `?categoryId=1` - Filtra por categoria
+- `?sortBy=criado_em` - Ordena resultados
+- `?sortOrder=DESC` - Ordem crescente/decrescente
 
 Todas as rotas de receitas requerem **autenticação via Bearer Token (JWT)**.
 
