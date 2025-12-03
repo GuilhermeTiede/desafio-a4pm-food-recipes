@@ -31,29 +31,52 @@
         </router-link>
       </div>
 
-      <!-- Barra de Pesquisa -->
-      <Card>
-        <div class="flex items-center gap-3">
-          <svg
-            class="w-5 h-5 text-a4pm-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      <!-- Barra de Pesquisa e Filtros -->
+      <div class="space-y-4">
+        <Card>
+          <div class="flex items-center gap-3">
+            <svg
+              class="w-5 h-5 text-a4pm-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <Input
+              v-model="searchTerm"
+              placeholder="Pesquisar receitas..."
+              class="flex-1"
             />
-          </svg>
-          <Input
-            v-model="searchTerm"
-            placeholder="Pesquisar receitas..."
-            class="flex-1"
-          />
-        </div>
-      </Card>
+          </div>
+        </Card>
+
+        <!-- Filtro de Categoria -->
+        <Card v-if="categoriaAtual">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-a4pm-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+              </svg>
+              <div>
+                <p class="text-sm text-a4pm-gray-600">Filtrando por categoria:</p>
+                <p class="font-semibold text-a4pm-gray-900">{{ categoriaAtual.nome }}</p>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" @click="limparFiltro">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              Limpar
+            </Button>
+          </div>
+        </Card>
+      </div>
 
       <!-- Loading -->
       <div v-if="receitasStore.loading" class="text-center py-12">
@@ -375,44 +398,72 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useReceitasStore } from "@/stores/receitas";
 import AuthenticatedLayout from "@/layouts/AuthenticatedLayout.vue";
 import Card from "@/components/ui/Card.vue";
 import Button from "@/components/ui/Button.vue";
 import Input from "@/components/ui/Input.vue";
 
+const route = useRoute();
+const router = useRouter();
 const receitasStore = useReceitasStore();
 const searchTerm = ref("");
 const receitaParaExcluir = ref(null);
 const excluindo = ref(false);
 
-const receitasFiltradas = computed(() => {
-  if (!searchTerm.value) {
-    return receitasStore.receitas;
-  }
-
-  const termo = searchTerm.value.toLowerCase();
-  return receitasStore.receitas.filter((receita) => {
-    return (
-      receita.nome.toLowerCase().includes(termo) ||
-      receita.categoria_nome?.toLowerCase().includes(termo) ||
-      receita.modo_preparo.toLowerCase().includes(termo) ||
-      receita.ingredientes?.toLowerCase().includes(termo)
-    );
-  });
+const categoriaAtual = computed(() => {
+  const categoriaId = route.query.categoria;
+  if (!categoriaId) return null;
+  
+  return receitasStore.categorias.find(c => c.id === parseInt(categoriaId));
 });
 
-function confirmarExclusao(receita) {
-  receitaParaExcluir.value = receita;
+const receitasFiltradas = computed(() => {
+  let receitas = receitasStore.receitas;
+
+  // Filtro por categoria (via query parameter)
+  if (route.query.categoria) {
+    const categoriaId = parseInt(route.query.categoria);
+    receitas = receitas.filter(r => r.id_categorias === categoriaId);
+  }
+
+  // Filtro por busca textual
+  if (searchTerm.value) {
+    const termo = searchTerm.value.toLowerCase();
+    receitas = receitas.filter((receita) => {
+      return (
+        receita.nome.toLowerCase().includes(termo) ||
+        receita.categoria_nome?.toLowerCase().includes(termo) ||
+        receita.modo_preparo.toLowerCase().includes(termo) ||
+        receita.ingredientes?.toLowerCase().includes(termo)
+      );
+    });
+  }
+
+  return receitas;
+});
+      receita.ingredientes?.toLowerCase().includes(termo)
+    );
+async function toggleFavorito(receita) {
+  const result = receita.is_favorito
+    ? await receitasStore.removerFavorito(receita.id)
+    : await receitasStore.adicionarFavorito(receita.id);
+
+  if (!result.success) {
+    alert(result.message);
+  }
 }
 
-async function excluirReceita() {
-  if (!receitaParaExcluir.value) return;
+function limparFiltro() {
+  router.push({ name: 'receitas' });
+}
 
-  excluindo.value = true;
-  const result = await receitasStore.deletarReceita(
-    receitaParaExcluir.value.id
+onMounted(() => {
+  receitasStore.listarReceitas();
+  receitasStore.listarCategorias();
+}); receitaParaExcluir.value.id
   );
   excluindo.value = false;
 
