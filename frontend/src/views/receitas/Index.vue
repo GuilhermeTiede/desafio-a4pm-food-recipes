@@ -398,7 +398,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useReceitasStore } from "@/stores/receitas";
 import AuthenticatedLayout from "@/layouts/AuthenticatedLayout.vue";
@@ -444,27 +444,16 @@ const receitasFiltradas = computed(() => {
 
   return receitas;
 });
-      receita.ingredientes?.toLowerCase().includes(termo)
-    );
-async function toggleFavorito(receita) {
-  const result = receita.is_favorito
-    ? await receitasStore.removerFavorito(receita.id)
-    : await receitasStore.adicionarFavorito(receita.id);
 
-  if (!result.success) {
-    alert(result.message);
-  }
+function confirmarExclusao(receita) {
+  receitaParaExcluir.value = receita;
 }
 
-function limparFiltro() {
-  router.push({ name: 'receitas' });
-}
+async function excluirReceita() {
+  if (!receitaParaExcluir.value) return;
 
-onMounted(() => {
-  receitasStore.listarReceitas();
-  receitasStore.listarCategorias();
-}); receitaParaExcluir.value.id
-  );
+  excluindo.value = true;
+  const result = await receitasStore.deletarReceita(receitaParaExcluir.value.id);
   excluindo.value = false;
 
   if (result.success) {
@@ -484,7 +473,13 @@ async function toggleFavorito(receita) {
   }
 }
 
+function limparFiltro() {
+  router.push({ name: 'receitas' });
+}
+
 onMounted(() => {
   receitasStore.listarReceitas();
+  receitasStore.listarCategorias();
 });
 </script>
+
