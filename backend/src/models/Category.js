@@ -1,4 +1,4 @@
-import db from '../config/database.js';
+import db from "../config/database.js";
 
 class Category {
   /**
@@ -6,7 +6,7 @@ class Category {
    */
   static async findAll() {
     const [categories] = await db.query(
-      'SELECT * FROM categorias ORDER BY nome'
+      "SELECT * FROM categorias ORDER BY nome"
     );
     return categories;
   }
@@ -16,7 +16,7 @@ class Category {
    */
   static async findById(id) {
     const [categories] = await db.query(
-      'SELECT * FROM categorias WHERE id = ?',
+      "SELECT * FROM categorias WHERE id = ?",
       [id]
     );
     return categories[0] || null;
@@ -27,7 +27,7 @@ class Category {
    */
   static async getRecipeCount(categoryId) {
     const [result] = await db.query(
-      'SELECT COUNT(*) as total FROM receitas WHERE id_categorias = ?',
+      "SELECT COUNT(*) as total FROM receitas WHERE id_categorias = ?",
       [categoryId]
     );
     return result[0].total;
@@ -48,6 +48,17 @@ class Category {
        ORDER BY c.nome`
     );
     return categories;
+  }
+
+  /**
+   * Cria nova categoria
+   */
+  static async create(nome) {
+    const [result] = await db.query(
+      "INSERT INTO categorias (nome) VALUES (?)",
+      [nome]
+    );
+    return await this.findById(result.insertId);
   }
 }
 
