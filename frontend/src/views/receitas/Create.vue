@@ -46,7 +46,19 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Categoria -->
             <div class="space-y-2">
-              <Label for="categoria" class="text-a4pm-gray-700 font-medium">Categoria</Label>
+              <div class="flex items-center justify-between">
+                <Label for="categoria" class="text-a4pm-gray-700 font-medium">Categoria</Label>
+                <button
+                  type="button"
+                  @click="showCategoryModal = true"
+                  class="text-sm text-a4pm-orange hover:text-a4pm-orange-dark font-medium flex items-center gap-1"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  Nova Categoria
+                </button>
+              </div>
               <select
                 id="categoria"
                 v-model="form.id_categorias"
@@ -125,6 +137,71 @@
           </div>
         </form>
       </Card>
+
+      <!-- Modal de Nova Categoria -->
+      <div v-if="showCategoryModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50" @click.self="closeCategoryModal">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-a4pm-gray-900">Nova Categoria</h3>
+            <button
+              type="button"
+              @click="closeCategoryModal"
+              class="text-a4pm-gray-400 hover:text-a4pm-gray-600"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Mensagem de erro -->
+          <div v-if="categoryError" class="p-3 bg-red-50 border-l-4 border-red-500 rounded text-sm text-red-700">
+            {{ categoryError }}
+          </div>
+
+          <!-- Mensagem de sucesso -->
+          <div v-if="categorySuccess" class="p-3 bg-green-50 border-l-4 border-green-500 rounded text-sm text-green-700">
+            {{ categorySuccess }}
+          </div>
+
+          <form @submit.prevent="handleCreateCategory" class="space-y-4">
+            <div class="space-y-2">
+              <Label for="nova-categoria" class="text-a4pm-gray-700 font-medium">
+                Nome da Categoria <span class="text-red-500">*</span>
+              </Label>
+              <Input
+                id="nova-categoria"
+                v-model="newCategoryName"
+                placeholder="Ex: Pratos Vegetarianos"
+                required
+                :disabled="creatingCategory"
+              />
+              <p class="text-xs text-a4pm-gray-500">
+                A categoria ficará disponível para todas as suas receitas
+              </p>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                class="flex-1"
+                @click="closeCategoryModal"
+                :disabled="creatingCategory"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                class="flex-1"
+                :disabled="creatingCategory"
+              >
+                {{ creatingCategory ? 'Criando...' : 'Criar Categoria' }}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </AuthenticatedLayout>
 </template>
@@ -154,6 +231,13 @@ const form = ref({
 const error = ref('')
 const loading = ref(false)
 
+// Modal de categoria
+const showCategoryModal = ref(false)
+const newCategoryName = ref('')
+const categoryError = ref('')
+const categorySuccess = ref('')
+const creatingCategory = ref(false)
+
 async function handleSubmit() {
   loading.value = true
   error.value = ''
@@ -167,6 +251,47 @@ async function handleSubmit() {
   }
 
   loading.value = false
+}
+
+async function handleCreateCategory() {
+  if (!newCategoryName.value.trim()) {
+    categoryError.value = 'Nome da categoria é obrigatório'
+    return
+  }
+
+  creatingCategory.value = true
+  categoryError.value = ''
+  categorySuccess.value = ''
+
+  try {
+    const result = await receitasStore.criarCategoria(newCategoryName.value.trim())
+
+    if (result.success) {
+      categorySuccess.value = 'Categoria criada com sucesso!'
+
+      // Recarrega categorias e seleciona a nova
+      await receitasStore.listarCategorias()
+      form.value.id_categorias = result.data.id
+
+      // Fecha modal após 1 segundo
+      setTimeout(() => {
+        closeCategoryModal()
+      }, 1000)
+    } else {
+      categoryError.value = result.message
+    }
+  } catch (err) {
+    categoryError.value = 'Erro ao criar categoria'
+  } finally {
+    creatingCategory.value = false
+  }
+}
+
+function closeCategoryModal() {
+  showCategoryModal.value = false
+  newCategoryName.value = ''
+  categoryError.value = ''
+  categorySuccess.value = ''
 }
 
 onMounted(() => {
