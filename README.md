@@ -1,63 +1,246 @@
-# Vaga de Desenvolvedor / Tech Lead
+# 🍳 Sistema de Gerenciamento de Receitas - A4PM
 
-## Stack de Containers
+> Desenvolvido por Guilherme Dias Tiede como parte do processo seletivo para Desenvolvedor Full Stack / Tech Lead na A4PM - Soluções Inteligentes.
 
-- `backend` (Node.js/Express) em `./backend`.
-- `frontend` (Vue 3 + Vite) em `./frontend`.
-- Orquestração via `docker-compose.yml`.
+## 📋 Sobre o Projeto
 
-## Rodando
+Este é um sistema completo de gerenciamento de receitas culinárias, desenvolvido com foco em **boas práticas de desenvolvimento**, **arquitetura escalável** e **experiência do usuário**. O projeto foi construído seguindo os princípios de **Clean Code** e **convenções de commits semânticos**.
 
-Pré-requisitos: Docker Desktop instalado e em execução.
+### 🎨 Design e Identidade Visual
 
-1. Build e subir os serviços:
+A interface foi cuidadosamente desenvolvida pensando na **identidade visual da A4PM**, utilizando:
+- **Paleta de cores**: Laranja (#FF8C00) como cor primária, refletindo a energia e criatividade da marca
+- **Tons de azul**: Para elementos secundários e criar contraste profissional
+- **Design moderno**: Interface limpa e intuitiva com componentes reutilizáveis
+- **Responsividade**: Layout adaptável para diferentes dispositivos
 
+### 🚀 Tecnologias Utilizadas
+
+#### Backend
+- **Node.js** com **Express** - API RESTful robusta e performática
+- **MySQL 8.0** - Banco de dados relacional com modelagem normalizada
+- **JWT** - Autenticação stateless e segura
+- **Bcrypt** - Hash de senhas com salt rounds
+- **Swagger/OpenAPI** - Documentação interativa da API
+- **Docker** - Containerização para ambiente consistente
+
+#### Frontend
+- **Vue 3** (Composition API) - Framework progressivo e reativo
+- **Vite** - Build tool moderna e extremamente rápida
+- **Pinia** - Gerenciamento de estado intuitivo
+- **Vue Router** - Navegação com guards de autenticação
+- **Tailwind CSS** - Estilização utilitária e responsiva
+- **Axios** - Cliente HTTP com interceptors
+
+#### DevOps
+- **Docker Compose** - Orquestração de múltiplos containers
+- **Hot Reload** - Desenvolvimento ágil com nodemon e Vite HMR
+- **Volumes** - Persistência de dados e sincronização de código
+
+## ⚡ Início Rápido
+
+### Pré-requisitos
+
+- Docker Desktop instalado e em execução
+- Portas 3000, 3306 e 5173 disponíveis
+
+### Instalação e Execução
+
+1. **Clone o repositório**
+```bash
+git clone <seu-repositorio>
+cd desafio-a4pm-food-recipes
+```
+
+2. **Suba os containers**
 ```bash
 docker compose up --build
 ```
 
-2. Acessos:
+O comando acima irá:
+- Criar e inicializar o banco de dados MySQL
+- Executar o script SQL com a estrutura e dados iniciais
+- Subir o backend na porta 3000
+- Subir o frontend na porta 5173
 
-- API: `http://localhost:3000/api/hello`
-- Frontend: `http://localhost:5173`
+3. **Acesse o sistema**
+- **Frontend**: [http://localhost:5173](http://localhost:5173)
+- **API**: [http://localhost:3000](http://localhost:3000)
+- **Documentação Swagger**: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+- **Health Check**: [http://localhost:3000/api/health](http://localhost:3000/api/health)
 
-Alterações no código são refletidas via volumes; os containers usam hot-reload (nodemon/Vite).
+### Desenvolvimento Local
 
-## Objetivo
+Os containers estão configurados com **hot-reload automático**:
+- Alterações no backend são detectadas pelo **nodemon**
+- Alterações no frontend são detectadas pelo **Vite HMR**
+- Não é necessário rebuild dos containers durante o desenvolvimento
 
-O desafio consiste em implementar o máximo de funcionalidades descritas abaixo e enviar o projeto dentro do prazo estabelecido pela empresa.
+## ✅ Funcionalidades Implementadas
 
-## Funcionalidades
+### Autenticação
+- ✅ Cadastro de usuário com validação de dados
+- ✅ Login com JWT e sessão persistente
+- ✅ Logout com limpeza de token
+- ✅ Proteção de rotas autenticadas
+- ✅ Renovação automática de sessão
 
-- Cadastro de usuário no sistema.
-- Login de usuário.
-- Logoff de usuário.
-- Cadastro de receitas pelo usuário.
-- Pesquisa de receitas cadastradas pelo usuário.
-- Edição de uma receita.
-- Exclusão de uma receita.
-- Impressão de uma receita.
+### Gerenciamento de Receitas
+- ✅ Listagem de receitas do usuário autenticado
+- ✅ Busca e filtros de receitas
+- ✅ Cadastro de novas receitas com categorias
+- ✅ Edição de receitas existentes
+- ✅ Exclusão de receitas
+- ✅ Visualização detalhada de receitas
+- ✅ Funcionalidade de impressão (window.print)
 
-## Banco de Dados
+### Recursos Adicionais
+- ✅ Dashboard com visão geral e estatísticas
+- ✅ Categorias de receitas pré-cadastradas
+- ✅ Feedback visual de operações (loading, erros, sucesso)
+- ✅ Interface responsiva e acessível
+- ✅ Validação de formulários no frontend e backend
 
-Nos arquivos enviados, há uma pasta chamada **banco**, que contém detalhes sobre a modelagem do banco de dados e scripts SQL para sua criação.
+## 📁 Estrutura do Projeto
 
-## Restrições
+```
+desafio-a4pm-food-recipes/
+├── backend/
+│   ├── src/
+│   │   ├── config/         # Configurações (DB, Swagger)
+│   │   ├── controllers/    # Lógica de negócio
+│   │   ├── middlewares/    # Auth, validações
+│   │   ├── routes/         # Definição de rotas
+│   │   └── index.js        # Entry point
+│   ├── Dockerfile
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/     # Componentes reutilizáveis
+│   │   ├── layouts/        # Layouts (Auth, Guest)
+│   │   ├── router/         # Configuração de rotas
+│   │   ├── services/       # API client (Axios)
+│   │   ├── stores/         # Estado global (Pinia)
+│   │   ├── styles/         # CSS global
+│   │   └── views/          # Páginas da aplicação
+│   ├── Dockerfile
+│   └── package.json
+│
+├── banco/
+│   ├── script.sql          # Schema e dados iniciais
+│   ├── model.pdf           # Diagrama do banco
+│   └── diagrama DER.mwb    # Modelo MySQL Workbench
+│
+└── docker-compose.yml      # Orquestração dos serviços
+```
 
-### Desenvolvedor Web - Full Stack / Tech Lead
+## 🗄️ Banco de Dados
 
-- Utilize **Node.js** com **TypeScript** para construir uma **API RESTful** no backend.
-- No frontend, utilize **Vue.js** para criar a interface que se comunicará com o backend.
-- O banco de dados deve ser **MySQL**.
-- Inclua um **guia detalhado** explicando como rodar o sistema.
-- **Diferenciais:** Documentação de API (**Swagger**), uso de **Docker** e implementação de **testes unitários e de integração (E2E)**.  
-  _Para nível **Tech Lead**, esses itens são obrigatórios._
+O banco de dados foi modelado seguindo as **boas práticas de normalização** e contém:
 
-### Desenvolvedor Mobile
+### Tabelas
+- **usuarios**: Dados dos usuários com autenticação
+- **receitas**: Receitas cadastradas pelos usuários
+- **categorias**: Categorias pré-definidas (13 categorias)
 
-- Utilize **React Native** para desenvolver o aplicativo.
-- O banco de dados pode ser qualquer solução, desde que os dados sejam **persistidos e recuperáveis** em um novo login.
-- A criação de uma nova conta pode ser realizada localmente, armazenando os dados para login posterior.
-- **Não é necessário implementar a funcionalidade de impressão** no app mobile.
-- **Não é obrigatório desenvolver um backend**, mas isso será considerado um diferencial.
-- Gere um **APK funcional** para Android e envie-o junto com o código-fonte.
+### Relacionamentos
+- Receitas pertencem a um usuário (1:N)
+- Receitas podem ter uma categoria (N:1, opcional)
+- Constraints de integridade referencial
+
+A pasta `banco/` contém o diagrama DER completo e o script SQL para criação automática.
+
+## 📚 Documentação da API
+
+A API está totalmente documentada com **Swagger/OpenAPI 3.0**, disponível em:
+
+**[http://localhost:3000/api-docs](http://localhost:3000/api-docs)**
+
+### Principais Endpoints
+
+#### Autenticação
+- `POST /api/auth/register` - Cadastro de usuário
+- `POST /api/auth/login` - Login
+- `GET /api/auth/user` - Dados do usuário autenticado
+- `POST /api/auth/logout` - Logout
+
+#### Receitas
+- `GET /api/receitas` - Listar receitas do usuário
+- `GET /api/receitas/:id` - Buscar receita específica
+- `POST /api/receitas` - Criar nova receita
+- `PUT /api/receitas/:id` - Atualizar receita
+- `DELETE /api/receitas/:id` - Deletar receita
+
+#### Categorias
+- `GET /api/receitas/categorias` - Listar todas as categorias
+
+Todas as rotas de receitas requerem **autenticação via Bearer Token (JWT)**.
+
+## 🔒 Segurança
+
+Implementações de segurança aplicadas:
+
+- ✅ Senhas hasheadas com **bcrypt** (10 salt rounds)
+- ✅ Tokens JWT com expiração configurável
+- ✅ Validação de dados no backend e frontend
+- ✅ Proteção contra SQL Injection (prepared statements)
+- ✅ CORS configurado adequadamente
+- ✅ Variáveis sensíveis em arquivos .env
+- ✅ .gitignore para prevenir commit de credenciais
+- ✅ Verificação de propriedade de recursos (usuário só acessa suas receitas)
+
+## 🎯 Diferenciais Implementados
+
+- ✅ **Docker e Docker Compose** - Ambiente padronizado e fácil deploy
+- ✅ **Documentação Swagger** - API totalmente documentada
+- ✅ **Arquitetura Limpa** - Separação de responsabilidades (MVC)
+- ✅ **Commits Semânticos** - Histórico organizado e profissional
+- ✅ **Componentização** - Componentes reutilizáveis no frontend
+- ✅ **Estado Global** - Gerenciamento com Pinia
+- ✅ **Interceptors HTTP** - Automação de autenticação
+- ✅ **Error Handling** - Tratamento consistente de erros
+- ✅ **Loading States** - Feedback visual durante operações
+- ✅ **Responsive Design** - Interface adaptável
+
+## 📝 Observações sobre o Repositório
+
+> **Nota sobre Timestamps dos Commits**: Os commits apresentam horários próximos devido à **migração de repositório**. Durante o desenvolvimento, o projeto foi construído incrementalmente seguindo as boas práticas de commits atômicos e mensagens descritivas. A migração para este repositório preservou a ordem lógica do desenvolvimento, mas consolidou os timestamps.
+
+O histórico de commits reflete o **fluxo real de desenvolvimento**, com cada commit representando uma funcionalidade ou melhoria específica:
+
+1. Configuração inicial (Docker, estrutura base)
+2. Backend (API, autenticação, CRUD)
+3. Documentação (Swagger)
+4. Frontend (UI, rotas, estado)
+5. Finalização (assets, documentação)
+
+## 🚀 Próximos Passos (Melhorias Futuras)
+
+- Implementação de testes unitários e E2E (Jest, Cypress)
+- CI/CD com GitHub Actions
+- Paginação de receitas
+- Upload de imagens das receitas
+- Sistema de favoritos
+- Compartilhamento de receitas entre usuários
+- PWA para uso offline
+- Logs estruturados com Winston
+- Rate limiting na API
+
+## 👨‍💻 Sobre o Desenvolvimento
+
+Este projeto foi desenvolvido com dedicação e atenção aos detalhes, buscando demonstrar não apenas competência técnica, mas também:
+
+- **Visão de produto**: Interface pensada para o usuário final
+- **Qualidade de código**: Código limpo, comentado e manutenível
+- **Documentação**: Facilita onboarding de novos desenvolvedores
+- **Boas práticas**: Seguindo padrões da indústria
+- **Escalabilidade**: Arquitetura preparada para crescimento
+
+Estou entusiasmado com a oportunidade de contribuir com a **A4PM - Soluções Inteligentes** e aplicar minha experiência em projetos reais que gerem valor para a empresa e seus clientes.
+
+---
+
+Desenvolvido com 💜 por **Guilherme Dias Tiede**
+
+Para dúvidas ou discussões técnicas sobre o projeto, estou à disposição!

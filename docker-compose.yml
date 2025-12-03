@@ -31,7 +31,7 @@ services:
       - DB_USER=root
       - DB_PASSWORD=root
       - DB_NAME=teste_receitas_rg_sistemas
-      - JWT_SECRET=a4pm_secret_key_2024_change_in_production
+      - JWT_SECRET=a4pm_secret_key_2025_change_in_production
       - JWT_EXPIRES_IN=7d
     depends_on:
       mysql:
