@@ -58,42 +58,42 @@
         </router-link>
       </div>
 
-      <!-- Categorias Populares -->
+      <!-- Categorias de Receitas -->
       <div>
-        <h3 class="text-xl font-bold text-a4pm-gray-900 mb-4">Categorias de Receitas</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <!-- Categoria 1 -->
-          <div class="bg-white rounded-lg border-2 border-a4pm-gray-200 p-6 hover:border-a4pm-orange transition-colors text-center cursor-pointer">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span class="text-3xl">🍰</span>
-            </div>
-            <p class="font-semibold text-a4pm-gray-900">Sobremesas</p>
-          </div>
-
-          <!-- Categoria 2 -->
-          <div class="bg-white rounded-lg border-2 border-a4pm-gray-200 p-6 hover:border-a4pm-orange transition-colors text-center cursor-pointer">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span class="text-3xl">🥗</span>
-            </div>
-            <p class="font-semibold text-a4pm-gray-900">Saladas</p>
-          </div>
-
-          <!-- Categoria 3 -->
-          <div class="bg-white rounded-lg border-2 border-a4pm-gray-200 p-6 hover:border-a4pm-orange transition-colors text-center cursor-pointer">
-            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span class="text-3xl">🍝</span>
-            </div>
-            <p class="font-semibold text-a4pm-gray-900">Massas</p>
-          </div>
-
-          <!-- Categoria 4 -->
-          <div class="bg-white rounded-lg border-2 border-a4pm-gray-200 p-6 hover:border-a4pm-orange transition-colors text-center cursor-pointer">
-            <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span class="text-3xl">🍖</span>
-            </div>
-            <p class="font-semibold text-a4pm-gray-900">Carnes</p>
-          </div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-a4pm-gray-900">Categorias de Receitas</h3>
+          <span v-if="receitasStore.categorias.length > 0" class="text-sm text-a4pm-gray-600">
+            {{ receitasStore.categorias.length }} {{ receitasStore.categorias.length === 1 ? 'categoria' : 'categorias' }}
+          </span>
         </div>
+
+        <!-- Loading -->
+        <div v-if="carregandoCategorias" class="text-center py-8">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-a4pm-orange border-t-transparent"></div>
+        </div>
+
+        <!-- Lista de Categorias -->
+        <div v-else-if="receitasStore.categorias.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <router-link
+            v-for="categoria in receitasStore.categorias.slice(0, 8)"
+            :key="categoria.id"
+            :to="`/receitas?categoria=${categoria.id}`"
+            class="bg-white rounded-lg border-2 border-a4pm-gray-200 p-6 hover:border-a4pm-orange hover:shadow-md transition-all text-center"
+          >
+            <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3"
+                 :class="getCategoriaStyle(categoria.id).bg">
+              <span class="text-3xl">{{ getCategoriaEmoji(categoria.nome) }}</span>
+            </div>
+            <p class="font-semibold text-a4pm-gray-900 mb-1">{{ categoria.nome }}</p>
+            <p class="text-xs text-a4pm-gray-500">{{ categoria.total_receitas || 0 }} {{ categoria.total_receitas === 1 ? 'receita' : 'receitas' }}</p>
+          </router-link>
+        </div>
+
+        <!-- Estado Vazio -->
+        <Card v-else class="text-center py-8">
+          <span class="text-4xl mb-3 block">📂</span>
+          <p class="text-a4pm-gray-600">Nenhuma categoria cadastrada ainda</p>
+        </Card>
       </div>
 
       <!-- Informações do Perfil -->
@@ -168,11 +168,81 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useReceitasStore } from '@/stores/receitas'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import Card from '@/components/ui/Card.vue'
 
 const authStore = useAuthStore()
+const receitasStore = useReceitasStore()
 const user = computed(() => authStore.user)
+const carregandoCategorias = ref(true)
+
+// Mapeamento de emojis por categoria
+const categoriaEmojis = {
+  'bolos': '🍰',
+  'tortas': '🥧',
+  'doces': '🍰',
+  'sobremesas': '🍨',
+  'carnes': '🍖',
+  'aves': '🍗',
+  'frango': '🍗',
+  'peixes': '🐟',
+  'frutos do mar': '🦐',
+  'saladas': '🥗',
+  'molhos': '🥫',
+  'acompanhamentos': '🍚',
+  'sopas': '🍲',
+  'massas': '🍝',
+  'bebidas': '🥤',
+  'lanches': '🥪',
+  'vegetariano': '🥬',
+  'vegano': '🌱',
+  'light': '🥗',
+  'saudável': '💚',
+  'prato único': '🍱'
+}
+
+// Cores diferentes para as categorias
+const cores = [
+  { bg: 'bg-red-100', text: 'text-red-600' },
+  { bg: 'bg-green-100', text: 'text-green-600' },
+  { bg: 'bg-yellow-100', text: 'text-yellow-600' },
+  { bg: 'bg-orange-100', text: 'text-orange-600' },
+  { bg: 'bg-blue-100', text: 'text-blue-600' },
+  { bg: 'bg-purple-100', text: 'text-purple-600' },
+  { bg: 'bg-pink-100', text: 'text-pink-600' },
+  { bg: 'bg-indigo-100', text: 'text-indigo-600' }
+]
+
+function getCategoriaEmoji(nomeCategoria) {
+  const nome = nomeCategoria.toLowerCase()
+  
+  // Procura por palavras-chave no nome da categoria
+  for (const [key, emoji] of Object.entries(categoriaEmojis)) {
+    if (nome.includes(key)) {
+      return emoji
+    }
+  }
+  
+  // Emoji padrão se não encontrar
+  return '🍽️'
+}
+
+function getCategoriaStyle(categoriaId) {
+  // Usa o ID da categoria para determinar a cor de forma consistente
+  const index = (categoriaId - 1) % cores.length
+  return cores[index]
+}
+
+async function carregarCategorias() {
+  carregandoCategorias.value = true
+  await receitasStore.listarCategorias()
+  carregandoCategorias.value = false
+}
+
+onMounted(() => {
+  carregarCategorias()
+})
 </script>
