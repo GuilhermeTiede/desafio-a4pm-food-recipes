@@ -5,7 +5,13 @@ import {
   criarReceita,
   atualizarReceita,
   deletarReceita,
-  listarCategorias
+  listarCategorias,
+  adicionarFavorito,
+  removerFavorito,
+  listarFavoritos,
+  avaliarReceita,
+  removerAvaliacao,
+  listarAvaliacoes
 } from '../controllers/receitasController.js';
 import { authenticateToken } from '../middlewares/auth.js';
 
@@ -337,5 +343,15 @@ router.put('/:id', atualizarReceita);
  *               $ref: '#/components/schemas/Error'
  */
 router.delete('/:id', deletarReceita);
+
+// Rotas de favoritos
+router.get('/favoritos/list', listarFavoritos);
+router.post('/:id/favorito', adicionarFavorito);
+router.delete('/:id/favorito', removerFavorito);
+
+// Rotas de avaliações
+router.get('/:id/avaliacoes', listarAvaliacoes);
+router.post('/:id/avaliar', avaliarReceita);
+router.delete('/:id/avaliar', removerAvaliacao);
 
 export default router;

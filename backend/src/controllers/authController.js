@@ -1,6 +1,5 @@
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import db from '../config/database.js';
+import User from '../models/User.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -19,33 +18,17 @@ export const register = async (req, res) => {
     }
 
     // Verificar se usuário já existe
-    const [existingUser] = await db.query(
-      'SELECT id FROM usuarios WHERE login = ?',
-      [email]
-    );
-
-    if (existingUser.length > 0) {
+    const existingUser = await User.findByEmail(email);
+    if (existingUser) {
       return res.status(409).json({ message: 'Usuário já existe' });
     }
 
-    // Hash da senha
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Inserir usuário
-    const [result] = await db.query(
-      'INSERT INTO usuarios (nome, login, senha, criado_em, alterado_em) VALUES (?, ?, ?, NOW(), NOW())',
-      [name, email, hashedPassword]
-    );
-
-    // Buscar usuário criado
-    const [newUser] = await db.query(
-      'SELECT id, nome, login, criado_em FROM usuarios WHERE id = ?',
-      [result.insertId]
-    );
+    // Criar usuário
+    const newUser = await User.create({ name, email, password });
 
     // Gerar token
     const token = jwt.sign(
-      { id: newUser[0].id, email: newUser[0].login },
+      { id: newUser.id, email: newUser.login },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
@@ -54,9 +37,9 @@ export const register = async (req, res) => {
       message: 'Usuário registrado com sucesso',
       token,
       user: {
-        id: newUser[0].id,
-        name: newUser[0].nome,
-        email: newUser[0].login
+        id: newUser.id,
+        name: newUser.nome,
+        email: newUser.login
       }
     });
   } catch (error) {
@@ -75,20 +58,13 @@ export const login = async (req, res) => {
     }
 
     // Buscar usuário
-    const [users] = await db.query(
-      'SELECT id, nome, login, senha FROM usuarios WHERE login = ?',
-      [email]
-    );
-
-    if (users.length === 0) {
+    const user = await User.findByEmail(email);
+    if (!user) {
       return res.status(401).json({ message: 'Credenciais inválidas' });
     }
 
-    const user = users[0];
-
     // Verificar senha
-    const isValidPassword = await bcrypt.compare(password, user.senha);
-
+    const isValidPassword = await User.verifyPassword(password, user.senha);
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Credenciais inválidas' });
     }
@@ -117,16 +93,11 @@ export const login = async (req, res) => {
 
 export const getUser = async (req, res) => {
   try {
-    const [users] = await db.query(
-      'SELECT id, nome, login, criado_em FROM usuarios WHERE id = ?',
-      [req.user.id]
-    );
+    const user = await User.findById(req.user.id);
 
-    if (users.length === 0) {
+    if (!user) {
       return res.status(404).json({ message: 'Usuário não encontrado' });
     }
-
-    const user = users[0];
 
     res.json({
       id: user.id,
