@@ -6,6 +6,7 @@ import {
   atualizarReceita,
   deletarReceita,
   listarCategorias,
+  criarCategoria,
   adicionarFavorito,
   removerFavorito,
   listarFavoritos,
@@ -52,6 +53,62 @@ router.use(authenticateToken);
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/categorias', listarCategorias);
+
+/**
+ * @swagger
+ * /receitas/categorias:
+ *   post:
+ *     summary: Criar categoria
+ *     description: Cria uma nova categoria de receita
+ *     tags: [Categorias]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nome
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 description: Nome da categoria
+ *                 example: Pratos Vegetarianos
+ *     responses:
+ *       201:
+ *         description: Categoria criada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Categoria criada com sucesso
+ *                 categoria:
+ *                   $ref: '#/components/schemas/Categoria'
+ *       400:
+ *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Erro interno do servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post('/categorias', criarCategoria);
 
 /**
  * @swagger

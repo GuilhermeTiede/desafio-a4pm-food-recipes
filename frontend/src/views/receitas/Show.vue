@@ -18,6 +18,16 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <Button
+            variant="outline"
+            @click="toggleFavorito"
+            :class="receita?.is_favorito ? 'text-red-500 border-red-300 hover:bg-red-50' : ''"
+          >
+            <svg class="w-5 h-5 mr-2" :class="receita?.is_favorito ? 'fill-current' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            {{ receita?.is_favorito ? 'Favorito' : 'Favoritar' }}
+          </Button>
           <router-link :to="`/receitas/${route.params.id}/editar`">
             <Button variant="outline">
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,6 +63,16 @@
                 <span v-if="receita.categoria_nome" class="px-4 py-2 bg-a4pm-orange/10 text-a4pm-orange rounded-full text-sm font-medium">
                   {{ receita.categoria_nome }}
                 </span>
+                <div v-if="receita.media_avaliacoes > 0" class="flex items-center gap-2">
+                  <StarRating :model-value="Number(receita.media_avaliacoes)" readonly show-value />
+                  <span class="text-sm text-a4pm-gray-500">({{ receita.total_avaliacoes }} {{ receita.total_avaliacoes === 1 ? 'avaliação' : 'avaliações' }})</span>
+                </div>
+                <div v-if="receita.total_favoritos > 0" class="flex items-center gap-2 text-a4pm-gray-600">
+                  <svg class="w-5 h-5 fill-current text-red-400" viewBox="0 0 24 24">
+                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                  </svg>
+                  <span class="text-sm">{{ receita.total_favoritos }} {{ receita.total_favoritos === 1 ? 'favorito' : 'favoritos' }}</span>
+                </div>
                 <div v-if="receita.tempo_preparo_minutos" class="flex items-center gap-2 text-a4pm-gray-600">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -115,19 +135,139 @@
             </div>
           </div>
         </Card>
-      </div>
 
-      <!-- Erro -->
-      <Card v-else class="text-center py-12 print:hidden">
-        <svg class="w-16 h-16 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-        </svg>
-        <h3 class="mt-4 text-lg font-semibold text-a4pm-gray-900">Receita não encontrada</h3>
-        <p class="mt-2 text-a4pm-gray-600">A receita que você está procurando não existe ou foi removida.</p>
-        <router-link to="/receitas">
-          <Button class="mt-6">Voltar para Receitas</Button>
-        </router-link>
-      </Card>
+        <!-- Seção de Avaliações -->
+        <Card class="print:hidden">
+          <div class="space-y-6">
+            <h3 class="text-2xl font-bold text-a4pm-gray-900">Avaliações</h3>
+
+            <!-- Formulário de Avaliação -->
+            <div class="bg-a4pm-gray-50 rounded-lg p-6 space-y-4">
+              <div>
+                <Label class="text-a4pm-gray-700 font-medium mb-2">Sua Avaliação</Label>
+                <StarRating v-model="novaAvaliacao.nota" size="lg" />
+              </div>
+
+              <div class="space-y-2">
+                <Label for="comentario" class="text-a4pm-gray-700 font-medium">Comentário (opcional)</Label>
+                <textarea
+                  id="comentario"
+                  v-model="novaAvaliacao.comentario"
+                  rows="3"
+                  placeholder="Compartilhe sua experiência com esta receita..."
+                  class="w-full px-3 py-2 border border-a4pm-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-a4pm-orange focus:border-transparent resize-none"
+                ></textarea>
+              </div>
+
+              <Button @click="enviarAvaliacao" :disabled="!novaAvaliacao.nota || enviandoAvaliacao">
+                {{ enviandoAvaliacao ? 'Enviando...' : 'Enviar Avaliação' }}
+              </Button>
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useReceitasStore } from '@/stores/receitas'
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
+import Card from '@/components/ui/Card.vue'
+import Button from '@/components/ui/Button.vue'
+import Label from '@/components/ui/Label.vue'
+import StarRating from '@/components/ui/StarRating.vue'
+
+const route = useRoute()
+const receitasStore = useReceitasStore()
+
+const receita = ref(null)
+const carregando = ref(true)
+const avaliacoes = ref([])
+const carregandoAvaliacoes = ref(false)
+const novaAvaliacao = ref({
+  nota: 0,
+  comentario: ''
+})
+const enviandoAvaliacao = ref(false)
+
+const ingredientesLista = computed(() => {
+  if (!receita.value?.ingredientes) return []
+  return receita.value.ingredientes
+    .split('\n')
+    .map(i => i.trim())
+    .filter(i => i.length > 0)
+})
+
+function formatarData(data) {
+  return new Date(data).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+function imprimir() {
+  window.print()
+}
+
+async function carregarReceita() {
+  carregando.value = true
+  const result = await receitasStore.buscarReceita(route.params.id)
+
+  if (result.success) {
+    receita.value = result.data
+  }
+
+  carregando.value = false
+}
+
+async function carregarAvaliacoes() {
+  carregandoAvaliacoes.value = true
+  const result = await receitasStore.listarAvaliacoes(route.params.id)
+
+  if (result.success) {
+    avaliacoes.value = result.data
+  }
+
+  carregandoAvaliacoes.value = false
+}
+
+async function toggleFavorito() {
+  if (!receita.value) return
+
+  const result = receita.value.is_favorito
+    ? await receitasStore.removerFavorito(receita.value.id)
+    : await receitasStore.adicionarFavorito(receita.value.id)
+
+  if (result.success) {
+    receita.value.is_favorito = !receita.value.is_favorito
+  } else {
+    alert(result.message)
+  }
+}
+
+async function enviarAvaliacao() {
+  if (!novaAvaliacao.value.nota) return
+
+  enviandoAvaliacao.value = true
+  const result = await receitasStore.avaliarReceita(
+    route.params.id,
+    novaAvaliacao.value.nota,
+    novaAvaliacao.value.comentario || null
+  )
+
+  if (result.success) {
+    novaAvaliacao.value = { nota: 0, comentario: '' }
+    await Promise.all([carregarReceita(), carregarAvaliacoes()])
+  } else {
+    alert(result.message)
+  }
+
+  enviandoAvaliacao.value = false
+}
+
+onMounted(() => {
+  carregarReceita()
+  carregarAvaliacoes()
+})
+</script>ard>
     </div>
   </AuthenticatedLayout>
 </template>
