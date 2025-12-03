@@ -60,17 +60,41 @@
         <Card v-if="categoriaAtual">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-a4pm-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+              <svg
+                class="w-5 h-5 text-a4pm-orange"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                />
               </svg>
               <div>
-                <p class="text-sm text-a4pm-gray-600">Filtrando por categoria:</p>
-                <p class="font-semibold text-a4pm-gray-900">{{ categoriaAtual.nome }}</p>
+                <p class="text-sm text-a4pm-gray-600">
+                  Filtrando por categoria:
+                </p>
+                <p class="font-semibold text-a4pm-gray-900">
+                  {{ categoriaAtual.nome }}
+                </p>
               </div>
             </div>
             <Button variant="outline" size="sm" @click="limparFiltro">
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              <svg
+                class="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
               Limpar
             </Button>
@@ -398,7 +422,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useReceitasStore } from "@/stores/receitas";
 import AuthenticatedLayout from "@/layouts/AuthenticatedLayout.vue";
@@ -416,8 +440,8 @@ const excluindo = ref(false);
 const categoriaAtual = computed(() => {
   const categoriaId = route.query.categoria;
   if (!categoriaId) return null;
-  
-  return receitasStore.categorias.find(c => c.id === parseInt(categoriaId));
+
+  return receitasStore.categorias.find((c) => c.id === parseInt(categoriaId));
 });
 
 const receitasFiltradas = computed(() => {
@@ -426,7 +450,7 @@ const receitasFiltradas = computed(() => {
   // Filtro por categoria (via query parameter)
   if (route.query.categoria) {
     const categoriaId = parseInt(route.query.categoria);
-    receitas = receitas.filter(r => r.id_categorias === categoriaId);
+    receitas = receitas.filter((r) => r.id_categorias === categoriaId);
   }
 
   // Filtro por busca textual
@@ -444,26 +468,17 @@ const receitasFiltradas = computed(() => {
 
   return receitas;
 });
-      receita.ingredientes?.toLowerCase().includes(termo)
-    );
-async function toggleFavorito(receita) {
-  const result = receita.is_favorito
-    ? await receitasStore.removerFavorito(receita.id)
-    : await receitasStore.adicionarFavorito(receita.id);
 
-  if (!result.success) {
-    alert(result.message);
-  }
+function confirmarExclusao(receita) {
+  receitaParaExcluir.value = receita;
 }
 
-function limparFiltro() {
-  router.push({ name: 'receitas' });
-}
+async function excluirReceita() {
+  if (!receitaParaExcluir.value) return;
 
-onMounted(() => {
-  receitasStore.listarReceitas();
-  receitasStore.listarCategorias();
-}); receitaParaExcluir.value.id
+  excluindo.value = true;
+  const result = await receitasStore.deletarReceita(
+    receitaParaExcluir.value.id
   );
   excluindo.value = false;
 
@@ -484,7 +499,12 @@ async function toggleFavorito(receita) {
   }
 }
 
+function limparFiltro() {
+  router.push({ name: "receitas" });
+}
+
 onMounted(() => {
   receitasStore.listarReceitas();
+  receitasStore.listarCategorias();
 });
 </script>
