@@ -6,13 +6,25 @@
         <div class="flex items-center gap-4">
           <router-link to="/receitas">
             <Button variant="outline" size="icon">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
               </svg>
             </Button>
           </router-link>
           <div>
-            <h2 class="text-3xl font-bold text-a4pm-gray-900">Visualizar Receita</h2>
+            <h2 class="text-3xl font-bold text-a4pm-gray-900">
+              Visualizar Receita
+            </h2>
             <p class="mt-1 text-a4pm-gray-600">Detalhes completos da receita</p>
           </div>
         </div>
@@ -21,24 +33,59 @@
           <Button
             variant="outline"
             @click="toggleFavorito"
-            :class="receita?.is_favorito ? 'text-red-500 border-red-300 hover:bg-red-50' : ''"
+            :class="
+              receita?.is_favorito
+                ? 'text-red-500 border-red-300 hover:bg-red-50'
+                : ''
+            "
           >
-            <svg class="w-5 h-5 mr-2" :class="receita?.is_favorito ? 'fill-current' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            <svg
+              class="w-5 h-5 mr-2"
+              :class="receita?.is_favorito ? 'fill-current' : ''"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
             </svg>
-            {{ receita?.is_favorito ? 'Favorito' : 'Favoritar' }}
+            {{ receita?.is_favorito ? "Favorito" : "Favoritar" }}
           </Button>
           <router-link :to="`/receitas/${route.params.id}/editar`">
             <Button variant="outline">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
               </svg>
               Editar
             </Button>
           </router-link>
           <Button @click="imprimir">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+              />
             </svg>
             Imprimir
           </Button>
@@ -47,7 +94,9 @@
 
       <!-- Loading -->
       <div v-if="carregando" class="text-center py-12 print:hidden">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-a4pm-orange border-t-transparent"></div>
+        <div
+          class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-a4pm-orange border-t-transparent"
+        ></div>
         <p class="mt-4 text-a4pm-gray-600">Carregando receita...</p>
       </div>
 
@@ -58,30 +107,88 @@
           <div class="space-y-6">
             <!-- Título e Categoria -->
             <div class="border-b border-a4pm-gray-200 pb-6">
-              <h1 class="text-4xl font-bold text-a4pm-gray-900 mb-3">{{ receita.nome }}</h1>
+              <h1 class="text-4xl font-bold text-a4pm-gray-900 mb-3">
+                {{ receita.nome }}
+              </h1>
               <div class="flex flex-wrap items-center gap-4">
-                <span v-if="receita.categoria_nome" class="px-4 py-2 bg-a4pm-orange/10 text-a4pm-orange rounded-full text-sm font-medium">
+                <span
+                  v-if="receita.categoria_nome"
+                  class="px-4 py-2 bg-a4pm-orange/10 text-a4pm-orange rounded-full text-sm font-medium"
+                >
                   {{ receita.categoria_nome }}
                 </span>
-                <div v-if="receita.media_avaliacoes > 0" class="flex items-center gap-2">
-                  <StarRating :model-value="Number(receita.media_avaliacoes)" readonly show-value />
-                  <span class="text-sm text-a4pm-gray-500">({{ receita.total_avaliacoes }} {{ receita.total_avaliacoes === 1 ? 'avaliação' : 'avaliações' }})</span>
+                <div
+                  v-if="receita.media_avaliacoes > 0"
+                  class="flex items-center gap-2"
+                >
+                  <StarRating
+                    :model-value="Number(receita.media_avaliacoes)"
+                    readonly
+                    show-value
+                  />
+                  <span class="text-sm text-a4pm-gray-500"
+                    >({{ receita.total_avaliacoes }}
+                    {{
+                      receita.total_avaliacoes === 1
+                        ? "avaliação"
+                        : "avaliações"
+                    }})</span
+                  >
                 </div>
-                <div v-if="receita.total_favoritos > 0" class="flex items-center gap-2 text-a4pm-gray-600">
-                  <svg class="w-5 h-5 fill-current text-red-400" viewBox="0 0 24 24">
-                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                <div
+                  v-if="receita.total_favoritos > 0"
+                  class="flex items-center gap-2 text-a4pm-gray-600"
+                >
+                  <svg
+                    class="w-5 h-5 fill-current text-red-400"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
                   </svg>
-                  <span class="text-sm">{{ receita.total_favoritos }} {{ receita.total_favoritos === 1 ? 'favorito' : 'favoritos' }}</span>
+                  <span class="text-sm"
+                    >{{ receita.total_favoritos }}
+                    {{
+                      receita.total_favoritos === 1 ? "favorito" : "favoritos"
+                    }}</span
+                  >
                 </div>
-                <div v-if="receita.tempo_preparo_minutos" class="flex items-center gap-2 text-a4pm-gray-600">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <div
+                  v-if="receita.tempo_preparo_minutos"
+                  class="flex items-center gap-2 text-a4pm-gray-600"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   <span>{{ receita.tempo_preparo_minutos }} minutos</span>
                 </div>
-                <div v-if="receita.porcoes" class="flex items-center gap-2 text-a4pm-gray-600">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                <div
+                  v-if="receita.porcoes"
+                  class="flex items-center gap-2 text-a4pm-gray-600"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
                   </svg>
                   <span>{{ receita.porcoes }} porções</span>
                 </div>
@@ -91,10 +198,22 @@
             <!-- Ingredientes -->
             <div v-if="receita.ingredientes" class="space-y-3">
               <div class="flex items-center gap-2">
-                <svg class="w-6 h-6 text-a4pm-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                <svg
+                  class="w-6 h-6 text-a4pm-orange"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
                 </svg>
-                <h2 class="text-2xl font-bold text-a4pm-gray-900">Ingredientes</h2>
+                <h2 class="text-2xl font-bold text-a4pm-gray-900">
+                  Ingredientes
+                </h2>
               </div>
               <div class="bg-a4pm-gray-50 rounded-lg p-6">
                 <div class="space-y-2">
@@ -103,8 +222,16 @@
                     :key="index"
                     class="flex items-start gap-3"
                   >
-                    <svg class="w-5 h-5 text-a4pm-orange mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    <svg
+                      class="w-5 h-5 text-a4pm-orange mt-0.5 flex-shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"
+                      />
                     </svg>
                     <span class="text-a4pm-gray-700">{{ ingrediente }}</span>
                   </div>
@@ -115,18 +242,36 @@
             <!-- Modo de Preparo -->
             <div class="space-y-3">
               <div class="flex items-center gap-2">
-                <svg class="w-6 h-6 text-a4pm-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                <svg
+                  class="w-6 h-6 text-a4pm-orange"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
-                <h2 class="text-2xl font-bold text-a4pm-gray-900">Modo de Preparo</h2>
+                <h2 class="text-2xl font-bold text-a4pm-gray-900">
+                  Modo de Preparo
+                </h2>
               </div>
               <div class="prose max-w-none">
-                <p class="text-a4pm-gray-700 whitespace-pre-line leading-relaxed">{{ receita.modo_preparo }}</p>
+                <p
+                  class="text-a4pm-gray-700 whitespace-pre-line leading-relaxed"
+                >
+                  {{ receita.modo_preparo }}
+                </p>
               </div>
             </div>
 
             <!-- Informações Adicionais - Oculto na impressão -->
-            <div class="border-t border-a4pm-gray-200 pt-6 text-sm text-a4pm-gray-500 print:hidden">
+            <div
+              class="border-t border-a4pm-gray-200 pt-6 text-sm text-a4pm-gray-500 print:hidden"
+            >
               <p>Criada por {{ receita.usuario_nome }}</p>
               <p>Adicionada em {{ formatarData(receita.criado_em) }}</p>
               <p v-if="receita.alterado_em !== receita.criado_em">
@@ -144,12 +289,16 @@
             <!-- Formulário de Avaliação -->
             <div class="bg-a4pm-gray-50 rounded-lg p-6 space-y-4">
               <div>
-                <Label class="text-a4pm-gray-700 font-medium mb-2">Sua Avaliação</Label>
+                <Label class="text-a4pm-gray-700 font-medium mb-2"
+                  >Sua Avaliação</Label
+                >
                 <StarRating v-model="novaAvaliacao.nota" size="lg" />
               </div>
 
               <div class="space-y-2">
-                <Label for="comentario" class="text-a4pm-gray-700 font-medium">Comentário (opcional)</Label>
+                <Label for="comentario" class="text-a4pm-gray-700 font-medium"
+                  >Comentário (opcional)</Label
+                >
                 <textarea
                   id="comentario"
                   v-model="novaAvaliacao.comentario"
@@ -159,169 +308,163 @@
                 ></textarea>
               </div>
 
-              <Button @click="enviarAvaliacao" :disabled="!novaAvaliacao.nota || enviandoAvaliacao">
-                {{ enviandoAvaliacao ? 'Enviando...' : 'Enviar Avaliação' }}
+              <Button
+                @click="enviarAvaliacao"
+                :disabled="!novaAvaliacao.nota || enviandoAvaliacao"
+              >
+                {{ enviandoAvaliacao ? "Enviando..." : "Enviar Avaliação" }}
               </Button>
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { useReceitasStore } from '@/stores/receitas'
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
-import Card from '@/components/ui/Card.vue'
-import Button from '@/components/ui/Button.vue'
-import Label from '@/components/ui/Label.vue'
-import StarRating from '@/components/ui/StarRating.vue'
+            </div>
 
-const route = useRoute()
-const receitasStore = useReceitasStore()
+            <!-- Lista de Avaliações -->
+            <div v-if="carregandoAvaliacoes" class="text-center py-4">
+              <div
+                class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-a4pm-orange border-t-transparent"
+              ></div>
+            </div>
 
-const receita = ref(null)
-const carregando = ref(true)
-const avaliacoes = ref([])
-const carregandoAvaliacoes = ref(false)
-const novaAvaliacao = ref({
-  nota: 0,
-  comentario: ''
-})
-const enviandoAvaliacao = ref(false)
+            <div v-else-if="avaliacoes.length > 0" class="space-y-4">
+              <div
+                v-for="avaliacao in avaliacoes"
+                :key="avaliacao.id"
+                class="border-b border-a4pm-gray-200 pb-4 last:border-0"
+              >
+                <div class="flex items-start justify-between mb-2">
+                  <div>
+                    <p class="font-medium text-a4pm-gray-900">
+                      {{ avaliacao.usuario_nome }}
+                    </p>
+                    <StarRating
+                      :model-value="avaliacao.nota"
+                      readonly
+                      size="sm"
+                    />
+                  </div>
+                  <span class="text-sm text-a4pm-gray-500">{{
+                    formatarData(avaliacao.criado_em)
+                  }}</span>
+                </div>
+                <p v-if="avaliacao.comentario" class="text-a4pm-gray-700 mt-2">
+                  {{ avaliacao.comentario }}
+                </p>
+              </div>
+            </div>
 
-const ingredientesLista = computed(() => {
-  if (!receita.value?.ingredientes) return []
-  return receita.value.ingredientes
-    .split('\n')
-    .map(i => i.trim())
-    .filter(i => i.length > 0)
-})
-
-function formatarData(data) {
-  return new Date(data).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-function imprimir() {
-  window.print()
-}
-
-async function carregarReceita() {
-  carregando.value = true
-  const result = await receitasStore.buscarReceita(route.params.id)
-
-  if (result.success) {
-    receita.value = result.data
-  }
-
-  carregando.value = false
-}
-
-async function carregarAvaliacoes() {
-  carregandoAvaliacoes.value = true
-  const result = await receitasStore.listarAvaliacoes(route.params.id)
-
-  if (result.success) {
-    avaliacoes.value = result.data
-  }
-
-  carregandoAvaliacoes.value = false
-}
-
-async function toggleFavorito() {
-  if (!receita.value) return
-
-  const result = receita.value.is_favorito
-    ? await receitasStore.removerFavorito(receita.value.id)
-    : await receitasStore.adicionarFavorito(receita.value.id)
-
-  if (result.success) {
-    receita.value.is_favorito = !receita.value.is_favorito
-  } else {
-    alert(result.message)
-  }
-}
-
-async function enviarAvaliacao() {
-  if (!novaAvaliacao.value.nota) return
-
-  enviandoAvaliacao.value = true
-  const result = await receitasStore.avaliarReceita(
-    route.params.id,
-    novaAvaliacao.value.nota,
-    novaAvaliacao.value.comentario || null
-  )
-
-  if (result.success) {
-    novaAvaliacao.value = { nota: 0, comentario: '' }
-    await Promise.all([carregarReceita(), carregarAvaliacoes()])
-  } else {
-    alert(result.message)
-  }
-
-  enviandoAvaliacao.value = false
-}
-
-onMounted(() => {
-  carregarReceita()
-  carregarAvaliacoes()
-})
-</script>ard>
+            <div v-else class="text-center py-8 text-a4pm-gray-500">
+              Nenhuma avaliação ainda. Seja o primeiro a avaliar!
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   </AuthenticatedLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { useReceitasStore } from '@/stores/receitas'
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
-import Card from '@/components/ui/Card.vue'
-import Button from '@/components/ui/Button.vue'
+import { ref, computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { useReceitasStore } from "@/stores/receitas";
+import AuthenticatedLayout from "@/layouts/AuthenticatedLayout.vue";
+import Card from "@/components/ui/Card.vue";
+import Button from "@/components/ui/Button.vue";
+import Label from "@/components/ui/Label.vue";
+import StarRating from "@/components/ui/StarRating.vue";
 
-const route = useRoute()
-const receitasStore = useReceitasStore()
+const route = useRoute();
+const receitasStore = useReceitasStore();
 
-const receita = ref(null)
-const carregando = ref(true)
+const receita = ref(null);
+const carregando = ref(true);
+const avaliacoes = ref([]);
+const carregandoAvaliacoes = ref(false);
+const novaAvaliacao = ref({
+  nota: 0,
+  comentario: "",
+});
+const enviandoAvaliacao = ref(false);
 
 const ingredientesLista = computed(() => {
-  if (!receita.value?.ingredientes) return []
+  if (!receita.value?.ingredientes) return [];
   return receita.value.ingredientes
-    .split('\n')
-    .map(i => i.trim())
-    .filter(i => i.length > 0)
-})
+    .split("\n")
+    .map((i) => i.trim())
+    .filter((i) => i.length > 0);
+});
 
 function formatarData(data) {
-  return new Date(data).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return new Date(data).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function imprimir() {
-  window.print()
+  window.print();
 }
 
 async function carregarReceita() {
-  carregando.value = true
-  const result = await receitasStore.buscarReceita(route.params.id)
+  carregando.value = true;
+  const result = await receitasStore.buscarReceita(route.params.id);
 
   if (result.success) {
-    receita.value = result.data
+    receita.value = result.data;
   }
 
-  carregando.value = false
+  carregando.value = false;
+}
+
+async function carregarAvaliacoes() {
+  carregandoAvaliacoes.value = true;
+  const result = await receitasStore.listarAvaliacoes(route.params.id);
+
+  if (result.success) {
+    avaliacoes.value = result.data;
+  }
+
+  carregandoAvaliacoes.value = false;
+}
+
+async function toggleFavorito() {
+  if (!receita.value) return;
+
+  const result = receita.value.is_favorito
+    ? await receitasStore.removerFavorito(receita.value.id)
+    : await receitasStore.adicionarFavorito(receita.value.id);
+
+  if (result.success) {
+    receita.value.is_favorito = !receita.value.is_favorito;
+  } else {
+    alert(result.message);
+  }
+}
+
+async function enviarAvaliacao() {
+  if (!novaAvaliacao.value.nota) return;
+
+  enviandoAvaliacao.value = true;
+  const result = await receitasStore.avaliarReceita(
+    route.params.id,
+    novaAvaliacao.value.nota,
+    novaAvaliacao.value.comentario || null
+  );
+
+  if (result.success) {
+    novaAvaliacao.value = { nota: 0, comentario: "" };
+    await Promise.all([carregarReceita(), carregarAvaliacoes()]);
+  } else {
+    alert(result.message);
+  }
+
+  enviandoAvaliacao.value = false;
 }
 
 onMounted(() => {
-  carregarReceita()
-})
+  carregarReceita();
+  carregarAvaliacoes();
+});
 </script>
 
 <style>
